@@ -55,7 +55,7 @@ type Connector struct {
 	ResourceType string        `xml:"resourceType,attr"`
 	Current      CurrentFolder `xml:"CurrentFolder"`
 	Dirs         Folders       `xml:"Folders"`
-	Entries      Files         `mxl:"Files"`
+	Files        Files         `mxl:"Files"`
 }
 
 //CurrentFolder is the current folder being parsed.
@@ -112,6 +112,10 @@ func Load(api *godig.API, dir string, c chan string) error {
 					return err
 				}
 				log.Printf("%+v\n", v)
+				for _, f := range v.Files.Entries {
+					p := v.Current.URL + f.Name
+					c <- p
+				}
 			}
 		}
 	}
