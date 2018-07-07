@@ -14,6 +14,8 @@ import (
 	"os"
 	"path"
 	"sync"
+
+	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
 //Run reads URLs from a channel and writes them to disk.
@@ -73,22 +75,26 @@ func Store(link string, dir string) (int64, error) {
 }
 
 func main() {
-	dir := "."
-	dataFile := "data"
+	var (
+		app   = kingpin.New("multicopy", "A command-line app to copy the contents of a list of URLs to a dir.")
+		dir   = app.Flag("dir", "output directory").Default(".").String()
+		count = app.Flag("count", "number of processors").Default("10").Int()
+		data  = app.Arg("data", "file containing URLs to store").Required().String()
+	)
+	app.Parse(os.Args[1:])
 
 	var wg sync.WaitGroup
-	count := 10
 	c := make(chan string)
 	done := make(chan bool)
 
-	for i := 1; i <= count; i++ {
+	for i := 1; i <= *count; i++ {
 		go func(i int) {
 			wg.Add(1)
 			defer wg.Done()
-			Run(c, dir, done)
+			Run(c, *dir, done)
 		}(i)
 	}
-	f, err := os.Open(dataFile)
+	f, err := os.Open(*data)
 	if err != nil {
 		log.Fatalf("%v\n", err)
 	}
