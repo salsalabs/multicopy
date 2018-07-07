@@ -4,34 +4,33 @@
 package main
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"path"
-	"strings"
 	"sync"
 )
 
 //Run reads URLs from a channel and writes them to disk.
 //Errors are logged and are not fatal.  Processing continues
 //until the done channel has contents or is closed.
-func Run(i int, c chan string, dir string, done chan bool) {
+func Run(c chan string, dir string, done chan bool) {
+	var errLog = log.New(os.Stderr, "", log.LstdFlags)
 	for {
 		select {
 		case u := <-c:
 			_, err := Store(u, dir)
 			if err != nil {
-				fmt.Printf("%d:  %v %s\n", i, err, u)
+				errLog.Printf("Error: %v %s\n", err, u)
 			} else {
-				fmt.Printf("%d: %s\n", i, u)
+				log.Printf("%s\n", u)
 			}
 		case <-done:
-			fmt.Printf("%d: done\n", i)
 			return
 		default:
 		}
@@ -47,7 +46,7 @@ func Store(link string, dir string) (int64, error) {
 		return 0, err
 	}
 	if r.StatusCode != 200 {
-		m := fmt.Sprintf("HTTP status %v", r.StatusCode)
+		m := fmt.Sprintf("%v (%v)", r.StatusCode, http.StatusText(r.StatusCode))
 		return 0, errors.New(m)
 	}
 	defer r.Body.Close()
@@ -74,26 +73,28 @@ func Store(link string, dir string) (int64, error) {
 }
 
 func main() {
-	b, err := ioutil.ReadFile("data")
-	if err != nil {
-		log.Fatalf("%v\n", err)
-	}
+	dir := "."
+	dataFile := "data"
 
 	var wg sync.WaitGroup
 	count := 10
 	c := make(chan string)
 	done := make(chan bool)
-	dir := "."
+
 	for i := 1; i <= count; i++ {
 		go func(i int) {
 			wg.Add(1)
 			defer wg.Done()
-			Run(i, c, dir, done)
+			Run(c, dir, done)
 		}(i)
 	}
-	urls := strings.Split(string(b), "\n")
-	for _, u := range urls {
-		c <- u
+	f, err := os.Open(dataFile)
+	if err != nil {
+		log.Fatalf("%v\n", err)
+	}
+	s := bufio.NewScanner(f)
+	for s.Scan() {
+		c <- s.Text()
 	}
 	close(done)
 	wg.Wait()
