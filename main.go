@@ -1,6 +1,29 @@
 //multicopy is a multi-threaded URL retriever.  You provide
-//a list of URLs to copy, multicopy does them as quickly as
-//possible.
+//a list of URLs to copy, multicopy reads each URL and stores
+//the contents in the specified directory.  Multicopy retains
+//the directory structure for each URL.  For example, a URL
+//like
+//
+// https://whatever.where.bizi/og/blarf/5/bijj.png
+//
+// will appear in
+//
+// [dir]/og/blarf/5/bijj.png
+//
+// Installation:
+//
+// go get github.com/salsalabs/multicopy
+//
+// go install github.com/salsalabs/multicopy
+//
+// Execution:
+//
+// multicopy [options] data-file
+//
+// Help:
+//
+// multicopy --help
+//
 package main
 
 import (
