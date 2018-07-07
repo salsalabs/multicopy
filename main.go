@@ -27,6 +27,7 @@
 package main
 
 import (
+	"encoding/xml"
 	"errors"
 	"fmt"
 	"io"
@@ -48,6 +49,44 @@ const (
 	RepTemplate = `https://hq.salsalabs.com/salsa/include/fck2.5.1/editor/filemanager/browser/default/connectors/jsp/connector?Command=GetFoldersAndFiles&Type=Image&CurrentFolder=/%s`
 )
 
+//Connector is the wrapper for the rest of the XML-based structure.
+type Connector struct {
+	Command      string        `xml:"command,attr"`
+	ResourceType string        `xml:"resourceType,attr"`
+	Current      CurrentFolder `xml:"CurrentFolder"`
+	Dirs         Folders       `xml:"Folders"`
+	Entries      Files         `mxl:"Files"`
+}
+
+//CurrentFolder is the current folder being parsed.
+type CurrentFolder struct {
+	Path string `xml:"path,attr"`
+	URL  string `xml:"url,attr"`
+}
+
+//Folders represents a list of folders.  Can be empty.
+type Folders struct {
+	XMLName xml.Name `xml:"Folders"`
+	Entries []Folder `xml:"Folder"`
+}
+
+//Files represents a list of fileds. Can be empty.
+type Files struct {
+	XMLName xml.Name `xml:"Files"`
+	Entries []Folder `xml:"File"`
+}
+
+//Folder represents a folder.  No contents, just the folder.
+type Folder struct {
+	Name string `xml:"name,attr"`
+}
+
+//File represents a file in the current folder.
+type File struct {
+	Name string `xml:"name,attr"`
+	Size string `xml:"size,attr"`
+}
+
 //Load reads a URL and pushes file URLs onto the provided channel.
 //avaialble from a Salsa Classic images and files repository. Load
 //calls itself re-entrantly to process directores in the repository.
@@ -66,7 +105,13 @@ func Load(api *godig.API, dir string, c chan string) error {
 			defer resp.Body.Close()
 			body, err := ioutil.ReadAll(resp.Body)
 			if err == nil {
-				log.Println(string(body))
+				//log.Printf("\n%v\n\n", string(body))
+				var v Connector
+				err := xml.Unmarshal(body, &v)
+				if err != nil {
+					return err
+				}
+				log.Printf("%+v\n", v)
 			}
 		}
 	}
