@@ -30,13 +30,8 @@ $HOME
 ```bash
 export PATH=$HOME/go/bin:$PATH
 ```
-* A list of URLs to retrieve in a file.  [Click here]((https://gist.github.com/salsalabs/7c1c69f9cae6280a5a8f)) to see how to retrieve the list of URLs.  The list is actually a bash script.
-Open the bash script with an editor and do the following.
-    * Sort the contents of the file.
-    * Remove duplicate lines (typically there's a `Unique lines` command in the editor).
-    * Remove all lines that do not start with `${CMD}`.
-    * Remove "`${CMD}` " from each line.  (There's a trailing space there...)
-    * Save the file in the current directory.
+* A list of URLs to retrieve in a file, one URL per line, no spaces
+or commas (or semicolons or pipes or tabs.)
 
 ## Installation
 
@@ -70,15 +65,29 @@ Args:
 Let's say you stored the list of urls into `boffo.txt`.  Here's how
 to store the contents of the URLs in `boffo.txt` to the current 
 directory.
-``bash
+```bash
 multicopy boffo.txt
 ```
-Here's now to store the contents into `/tmp`.
+Here's how to store the contents into `/tmp`.
 ```bash
-multicopy --dir/tmp boffo.txt
+multicopy --dir /tmp boffo.txt
 ```
+The output files will be stored starting in the current directory or directory that you choose. Here's an example.  If the URL is
+
+`https://a.b.bizi/ochre/ogre/image.png`
+
+And the `multicopy` command is 
+```bash
+multicopy --dir /home/me/mine boffo.txt
+```
+then `multicopy` will store the file in
+
+`/home/me/mine/ochre/ogre/image.png`
+
+`Multicopy` will automatically create any directories that he needs.
+
 ## License
 Read the `LICENSE` file in this repository.
 ## Questions?  Comments?
-Use the [Issues](https://github.com/salsalabs/multicopy/issues) link
-in GitHub.
+Please don't waste your time by contacting Salsalabs support. Use the [Issues](https://github.com/salsalabs/multicopy/issues) link
+in GitHub. 
