@@ -111,6 +111,7 @@ func main() {
 	c := make(chan string)
 	done := make(chan bool)
 
+	// Start processors.
 	for i := 1; i <= *count; i++ {
 		go func(i int) {
 			wg.Add(1)
@@ -118,6 +119,9 @@ func main() {
 			Run(c, *dir, done)
 		}(i)
 	}
+
+	// Queue up urls.  No buffering means that the URL
+	// is not queued until there's a listener.
 	f, err := os.Open(*data)
 	if err != nil {
 		log.Fatalf("%v\n", err)
@@ -126,6 +130,10 @@ func main() {
 	for s.Scan() {
 		c <- s.Text()
 	}
+
+	// Tells the processors that we're through.
 	close(done)
+
+	// Wait for everything to finish.
 	wg.Wait()
 }
