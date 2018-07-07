@@ -72,19 +72,22 @@ Here's how to store the contents into `/tmp`.
 ```bash
 multicopy --dir /tmp boffo.txt
 ```
-The output files will be stored starting in the current directory or directory that you choose. Here's an example.  If the URL is
+The output files will be stored starting in the current directory or directory that you choose.
+
+Here's an example.  Let's say that this is the image URL.
 
 `https://a.b.bizi/ochre/ogre/image.png`
 
-And the `multicopy` command is 
+and this is the `multicopy` command line.
 ```bash
 multicopy --dir /home/me/mine boffo.txt
 ```
-then `multicopy` will store the file in
+`Multicopy` will store the file in
 
 `/home/me/mine/ochre/ogre/image.png`
 
-`Multicopy` will automatically create any directories that he needs.
+Note that `multicopy` will automatically any directories needed
+to store stuff.
 
 ## License
 Read the `LICENSE` file in this repository.
