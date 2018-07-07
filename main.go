@@ -36,6 +36,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"strings"
 	"sync"
 
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
@@ -63,9 +64,9 @@ func Run(c chan string, dir string, done chan bool) {
 	}
 }
 
-//Store saves a URL to disk.  The contents are stored
-//in the provided directory keeping the URL's directory
-//structure intact.
+//Store saves a URL to disk.  The contents are stored starting in
+//the provided directory keeping the URL's directory structure
+//intact.
 func Store(link string, dir string) (int64, error) {
 	r, err := http.Get(link)
 	if err != nil {
@@ -98,6 +99,8 @@ func Store(link string, dir string) (int64, error) {
 	return int64(n), nil
 }
 
+//main is the application.  Gathers arguments, starts listeners, reads
+//URLs and processes them.
 func main() {
 	var (
 		app   = kingpin.New("multicopy", "A command-line app to copy the contents of a list of URLs to a dir.")
@@ -128,7 +131,7 @@ func main() {
 	}
 	s := bufio.NewScanner(f)
 	for s.Scan() {
-		c <- s.Text()
+		c <- strings.TrimSpace(s.Text())
 	}
 
 	// Tells the processors that we're through.
