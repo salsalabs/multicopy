@@ -27,20 +27,51 @@
 package main
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"path"
-	"strings"
 	"sync"
+
+	"github.com/salsalabs/godig"
 
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
+
+const (
+	//RepTemplate is the URL temlate for retrieving the contents of a dir.
+	RepTemplate = `https://hq.salsalabs.com/salsa/include/fck2.5.1/editor/filemanager/browser/default/connectors/jsp/connector?Command=GetFoldersAndFiles&Type=Image&CurrentFolder=/%s`
+)
+
+//Load reads a URL and pushes file URLs onto the provided channel.
+//avaialble from a Salsa Classic images and files repository. Load
+//calls itself re-entrantly to process directores in the repository.
+//Load returns when all directories have been examined.
+func Load(api *godig.API, dir string, c chan string) error {
+	u := fmt.Sprintf(RepTemplate, dir)
+	log.Println(u)
+	req, err := http.NewRequest("GET", u, nil)
+	if err == nil {
+		// Salsa's API needs these cookies to verify authentication.
+		for _, c := range api.Cookies {
+			req.AddCookie(c)
+		}
+		resp, err := api.Client.Do(req)
+		if err == nil {
+			defer resp.Body.Close()
+			body, err := ioutil.ReadAll(resp.Body)
+			if err == nil {
+				log.Println(string(body))
+			}
+		}
+	}
+	return err
+}
 
 //Run reads URLs from a channel and writes them to disk.
 //Errors are logged and are not fatal.  Processing continues
@@ -104,11 +135,17 @@ func Store(link string, dir string) (int64, error) {
 func main() {
 	var (
 		app   = kingpin.New("multicopy", "A command-line app to copy the contents of a list of URLs to a dir.")
+		login = app.Flag("login", "YAML file with login credentials").Required().String()
 		dir   = app.Flag("dir", "Store contents starting in this directory.").Default(".").String()
 		count = app.Flag("count", "Start this number of processors.").Default("20").Int()
-		data  = app.Arg("data", "File of URLs to store, one per line.").Required().String()
+		//data  = app.Arg("data", "File of URLs to store, one per line.").Required().String()
 	)
 	app.Parse(os.Args[1:])
+
+	api, err := (godig.YAMLAuth(*login))
+	if err != nil {
+		log.Fatalf("%v\n", err)
+	}
 
 	var wg sync.WaitGroup
 	c := make(chan string)
@@ -125,13 +162,10 @@ func main() {
 
 	// Queue up urls.  No buffering means that the URL
 	// is not queued until there's a listener.
-	f, err := os.Open(*data)
+	repDir := ""
+	err = Load(api, repDir, c)
 	if err != nil {
 		log.Fatalf("%v\n", err)
-	}
-	s := bufio.NewScanner(f)
-	for s.Scan() {
-		c <- strings.TrimSpace(s.Text())
 	}
 
 	// Tells the processors that we're through.
