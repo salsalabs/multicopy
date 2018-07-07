@@ -24,14 +24,15 @@ func run(i int, c chan string, d chan bool) {
 	}
 }
 func main() {
-	var wg sync.WaitGroup
-	count := 10
-	c := make(chan string)
-	d := make(chan bool)
 	b, err := ioutil.ReadFile("data")
 	if err != nil {
 		log.Fatalf("%v\n", err)
 	}
+
+	var wg sync.WaitGroup
+	count := 10
+	c := make(chan string)
+	d := make(chan bool)
 	for i := 1; i <= count; i++ {
 		go func(i int) {
 			wg.Add(1)
