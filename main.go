@@ -23,6 +23,7 @@ import (
 //until the done channel has contents or is closed.
 func Run(c chan string, dir string, done chan bool) {
 	var errLog = log.New(os.Stderr, "", log.LstdFlags)
+	var stdLog = log.New(os.Stdout, "", log.LstdFlags)
 	for {
 		select {
 		case u := <-c:
@@ -30,7 +31,7 @@ func Run(c chan string, dir string, done chan bool) {
 			if err != nil {
 				errLog.Printf("Error: %v %s\n", err, u)
 			} else {
-				log.Printf("%s\n", u)
+				stdLog.Printf("%s\n", u)
 			}
 		case <-done:
 			return
@@ -77,9 +78,9 @@ func Store(link string, dir string) (int64, error) {
 func main() {
 	var (
 		app   = kingpin.New("multicopy", "A command-line app to copy the contents of a list of URLs to a dir.")
-		dir   = app.Flag("dir", "output directory").Default(".").String()
-		count = app.Flag("count", "number of processors").Default("10").Int()
-		data  = app.Arg("data", "file containing URLs to store").Required().String()
+		dir   = app.Flag("dir", "Store contents starting in this directory.").Default(".").String()
+		count = app.Flag("count", "Start this number of processors.").Default("20").Int()
+		data  = app.Arg("data", "File of URLs to store, one per line.").Required().String()
 	)
 	app.Parse(os.Args[1:])
 
