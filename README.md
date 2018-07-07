@@ -82,12 +82,9 @@ and this is the `multicopy` command line.
 ```bash
 multicopy --dir /home/me/mine boffo.txt
 ```
-`Multicopy` will store the file in
+`Multicopy` will create all of the necessary directories in `/home/e/mine` then write `image.png` to
 
 `/home/me/mine/ochre/ogre/image.png`
-
-Note that `multicopy` will automatically any directories needed
-to store stuff.
 
 ## License
 Read the `LICENSE` file in this repository.
