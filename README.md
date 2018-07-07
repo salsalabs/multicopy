@@ -3,19 +3,18 @@
 
 ## Background
 Salsa's clients store images and files on Salsa so that they can 
-be served up using a secure ("https://") URL.  You can learn more
-about the images and file directory by [clicking here](https://help.salsalabs.com/hc/en-us/articles/223342607-Upload-images-or-files-to-Salsa).
-There is a detailed description of how the images and files repository works [here](https://help.salsalabs.com/hc/en-us/articles/223342727-Managing-files-uploaded-to-Salsa). 
+be served up using a secure ("https://") URL.  The files are uploaded to the "images and files" repository.  You can learn more
+about uploading images and files to Salsay by [clicking here](https://help.salsalabs.com/hc/en-us/articles/223342607-Upload-images-or-files-to-Salsa).
+You can learn more about the images and files repository itself by [clicking  here](https://help.salsalabs.com/hc/en-us/articles/223342727-Managing-files-uploaded-to-Salsa). 
 
-Salsa has a process for retrieving a client's images and files.
-The process is described in [this GitHub repository](https://gist.github.com/salsalabs/7c1c69f9cae6280a5a8f).  That
-process uses `wget` to retrieve files from Salsa.  The constraint
-is that `wget` can only retrieve one file at a time due to the way
-that Salsa stores files.  (Hint: Salsa does not allow access to
-the directories that contain the files.)
+Salsa has a [process for retrieving a client's images and files](https://gist.github.com/salsalabs/7c1c69f9cae6280a5a8f).  That
+process uses `wget` to retrieve files from Salsa.
+
+Because there's not a programmatic way to either list the contents of the repository or retrieve all of the files from a directory in the repository, the process calls `wget` to retrieve a single file at a time.
 
 This app speeds things up by having several processors save images
-and files at the same time.
+and files at the same time.  Using `wget` typically takes about an hour to retrieve the images and files for a client.  This app retrieves the same files in about 20 seconds.
+
 # Prerequisites
 * The [Go](https://golang.org/doc/install) programming language.
 * The correct directory structure.  Here's a sample.
