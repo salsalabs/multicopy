@@ -8,18 +8,41 @@ import (
 	"io/ioutil"
 	"log"
 	"strings"
+	"sync"
 )
 
+func run(i int, c chan string, d chan bool) {
+	for {
+		select {
+		case u := <-c:
+			fmt.Printf("%d: '%s'\n", i, u)
+		case <-d:
+			fmt.Printf("%d: done\n", i)
+			return
+		default:
+		}
+	}
+}
 func main() {
-	//var wg sync.WaitGroup
-	//count := 10
-	//c := make(chan string)
-	//d := make(chan bool)
+	var wg sync.WaitGroup
+	count := 10
+	c := make(chan string)
+	d := make(chan bool)
 	b, err := ioutil.ReadFile("data")
 	if err != nil {
 		log.Fatalf("%v\n", err)
 	}
+	for i := 1; i <= count; i++ {
+		go func(i int) {
+			wg.Add(1)
+			defer wg.Done()
+			run(i, c, d)
+		}(i)
+	}
 	urls := strings.Split(string(b), "\n")
-	fmt.Println(urls)
-
+	for _, u := range urls {
+		c <- u
+	}
+	close(d)
+	wg.Wait()
 }
