@@ -46,7 +46,7 @@ import (
 
 const (
 	//RepTemplate is the URL temlate for retrieving the contents of a dir.
-	RepTemplate = `https://hq.salsalabs.com/salsa/include/fck2.5.1/editor/filemanager/browser/default/connectors/jsp/connector?Command=GetFoldersAndFiles&Type=Image&CurrentFolder=/%s`
+	RepTemplate = `https://hq.salsalabs.com/salsa/include/fck2.5.1/editor/filemanager/browser/default/connectors/jsp/connector?Command=GetFoldersAndFiles&Type=Image&CurrentFolder=%s`
 )
 
 //Connector is the wrapper for the rest of the XML-based structure.
@@ -87,50 +87,62 @@ type File struct {
 	Size string `xml:"size,attr"`
 }
 
-//Load reads a URL and pushes file URLs onto the provided channel.
-//avaialble from a Salsa Classic images and files repository. Load
-//calls itself re-entrantly to process directores in the repository.
-//Load returns when all directories have been examined.
-func Load(api *godig.API, dir string, c chan string) error {
+//Load reads repository folder names from a channel.  The directory
+//name is used to create a URL used to list the directory.  Files
+//in the directory are written to the files channel.
+func Load(api *godig.API, dir string, files chan string) error {
 	u := fmt.Sprintf(RepTemplate, dir)
-	log.Println(u)
 	req, err := http.NewRequest("GET", u, nil)
-	if err == nil {
-		// Salsa's API needs these cookies to verify authentication.
-		for _, c := range api.Cookies {
-			req.AddCookie(c)
-		}
-		resp, err := api.Client.Do(req)
-		if err == nil {
-			defer resp.Body.Close()
-			body, err := ioutil.ReadAll(resp.Body)
-			if err == nil {
-				//log.Printf("\n%v\n\n", string(body))
-				var v Connector
-				err := xml.Unmarshal(body, &v)
-				if err != nil {
-					return err
-				}
-				log.Printf("%+v\n", v)
-				for _, f := range v.Files.Entries {
-					p := v.Current.URL + f.Name
-					c <- p
-				}
-			}
+	if err != nil {
+		return err
+	}
+	// Salsa's API needs these cookies to verify authentication.
+	for _, c := range api.Cookies {
+		req.AddCookie(c)
+	}
+	resp, err := api.Client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	var v Connector
+	err = xml.Unmarshal(body, &v)
+	if err != nil {
+		return err
+	}
+
+	// Queue up files for processing.
+	for _, f := range v.Files.Entries {
+		p := v.Current.URL + f.Name
+		files <- p
+	}
+
+	//Queue up folders for processing.
+	for _, d := range v.Dirs.Entries {
+		p := v.Current.Path + d.Name + "/"
+		err = Load(api, p, files)
+		if err != nil {
+			log.Printf("%v on '%v'\n", err, d.Name)
 		}
 	}
-	return err
+	return nil
 }
 
-//Run reads URLs from a channel and writes them to disk.
+//Run reads names from the files channel and writes them to disk.
+//
 //Errors are logged and are not fatal.  Processing continues
 //until the done channel has contents or is closed.
-func Run(c chan string, dir string, done chan bool) {
+func Run(api *godig.API, dir string, files chan string, done chan bool) {
 	var errLog = log.New(os.Stderr, "", log.LstdFlags)
 	var stdLog = log.New(os.Stdout, "", log.LstdFlags)
 	for {
 		select {
-		case u := <-c:
+		case u := <-files:
 			_, err := Store(u, dir)
 			if err != nil {
 				errLog.Printf("Error: %v %s\n", err, u)
@@ -196,28 +208,27 @@ func main() {
 		log.Fatalf("%v\n", err)
 	}
 
-	var wg sync.WaitGroup
-	c := make(chan string)
+	files := make(chan string)
 	done := make(chan bool)
+	var wg sync.WaitGroup
 
-	// Start processors.
+	// Start the processors.
 	for i := 1; i <= *count; i++ {
 		go func(i int) {
 			wg.Add(1)
 			defer wg.Done()
-			Run(c, *dir, done)
+			Run(api, *dir, files, done)
 		}(i)
 	}
 
-	// Queue up urls.  No buffering means that the URL
-	// is not queued until there's a listener.
-	repDir := ""
-	err = Load(api, repDir, c)
+	// Start at the root dir.  Load will use itself
+	// to process subdirs.
+	err = Load(api, "/", files)
 	if err != nil {
-		log.Fatalf("%v\n", err)
+		panic(err)
 	}
 
-	// Tells the processors that we're through.
+	// Tell the processors that we're through.
 	close(done)
 
 	// Wait for everything to finish.
