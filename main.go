@@ -91,6 +91,9 @@ type File struct {
 //name is used to create a URL used to list the directory.  Files
 //in the directory are written to the files channel.
 func Load(api *godig.API, dir string, files chan string) error {
+	var errLog = log.New(os.Stderr, "", log.LstdFlags)
+	var stdLog = log.New(os.Stdout, "", log.LstdFlags)
+	stdLog.Printf("Folder '%s'\n", dir)
 	u := fmt.Sprintf(RepTemplate, dir)
 	req, err := http.NewRequest("GET", u, nil)
 	if err != nil {
@@ -122,12 +125,12 @@ func Load(api *godig.API, dir string, files chan string) error {
 		files <- p
 	}
 
-	//Queue up folders for processing.
+	//Re-entrantly process folders.
 	for _, d := range v.Dirs.Entries {
 		p := v.Current.Path + d.Name + "/"
 		err = Load(api, p, files)
 		if err != nil {
-			log.Printf("%v on '%v'\n", err, d.Name)
+			errLog.Printf("%v on '%v'\n", err, d.Name)
 		}
 	}
 	return nil
@@ -139,7 +142,7 @@ func Load(api *godig.API, dir string, files chan string) error {
 //until the done channel has contents or is closed.
 func Run(api *godig.API, dir string, files chan string, done chan bool) {
 	var errLog = log.New(os.Stderr, "", log.LstdFlags)
-	var stdLog = log.New(os.Stdout, "", log.LstdFlags)
+	//var stdLog = log.New(os.Stdout, "", log.LstdFlags)
 	for {
 		select {
 		case u := <-files:
@@ -147,7 +150,7 @@ func Run(api *godig.API, dir string, files chan string, done chan bool) {
 			if err != nil {
 				errLog.Printf("Error: %v %s\n", err, u)
 			} else {
-				stdLog.Printf("%s\n", u)
+				//stdLog.Printf("%s\n", u)
 			}
 		case <-done:
 			return
