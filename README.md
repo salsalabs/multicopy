@@ -37,7 +37,7 @@ Files from the repository are written to disk, retaining then directory structur
         + src
   ```
 
-* Assuure that the Go `bin` directory in your path.  In Linux and OSX, the command is
+* Assure that the Go `bin` directory in your path.  In Linux and OSX, the command is
 
     ```export PATH=$HOME/go/bin:$PATH```
   
@@ -53,7 +53,6 @@ Files from the repository are written to disk, retaining then directory structur
     ```bash
     go install github.com/salsalabs/godig
     ```
-
 1. Retrieve the `multicopy` package:
     ```bash
     go get github.com/salsalabs/multicopy
