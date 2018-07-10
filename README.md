@@ -144,7 +144,7 @@ If you are extracting images and files for a chapter, then the chapter is insert
               + (files)
               + (more folders)
 ```
-You can learn more about the images and files repository dorectory structure by [clicking  here](https://help.salsalabs.com/hc/en-us/articles/223342727-Managing-files-uploaded-to-Salsa).
+You can learn more about the images and files repository directory structure by [clicking  here](https://help.salsalabs.com/hc/en-us/articles/223342727-Managing-files-uploaded-to-Salsa).
 
 Here's an example.  Let's say that this is the image URL.
 
@@ -152,9 +152,9 @@ Here's an example.  Let's say that this is the image URL.
 
 and this is the `multicopy` command line.
 ```bash
-multicopy --dir /home/me/mine boffo.txt
+multicopy --login boffo.yaml --dir /home/me/mine
 ```
-`Multicopy` will all of the directories to put `image.png` into this structure
+`Multicopy` will create this directory tree and then write `image.png`.
 
 ```
 /home
@@ -172,6 +172,7 @@ multicopy --dir /home/me/mine boffo.txt
           + ochre
             |
             + ogre
+              |
               + image.png
 ```
 
