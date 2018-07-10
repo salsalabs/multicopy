@@ -1,14 +1,8 @@
 //Multicopy is a multi-threaded URL retriever.  You provide
-//a list of URLs to copy, multicopy reads each URL and stores
-//the contents in the specified directory.  Multicopy retains
-//the directory structure for each URL.  For example, a URL
-//like
-//
-// https://whatever.where.bizi/og/blarf/5/bijj.png
-//
-// will appear in
-//
-// [dir]/og/blarf/5/bijj.png
+//provide login credentials to an instance of Salas Classic.
+//Multicopy walks the directory tree in the images and files
+//repository and saves files to disk.  Files are stored in the
+//same structure on disk as they appear in the repository.
 //
 // Installation:
 //
@@ -18,7 +12,7 @@
 //
 // Execution:
 //
-// multicopy [options] data-file
+// multicopy --login [YAML file] --dir [DIR]
 //
 // Help:
 //
@@ -46,6 +40,7 @@ import (
 
 const (
 	//RepTemplate is the URL temlate for retrieving the contents of a dir.
+	//The contents of the resulting URL are returned from Salsa has an XML structure.
 	RepTemplate = `https://hq.salsalabs.com/salsa/include/fck2.5.1/editor/filemanager/browser/default/connectors/jsp/connector?Command=GetFoldersAndFiles&Type=Image&CurrentFolder=%s`
 )
 
