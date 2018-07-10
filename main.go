@@ -1,4 +1,4 @@
-//multicopy is a multi-threaded URL retriever.  You provide
+//Multicopy is a multi-threaded URL retriever.  You provide
 //a list of URLs to copy, multicopy reads each URL and stores
 //the contents in the specified directory.  Multicopy retains
 //the directory structure for each URL.  For example, a URL
@@ -137,7 +137,6 @@ func Load(api *godig.API, dir string, files chan string) error {
 }
 
 //Run reads names from the files channel and writes them to disk.
-//
 //Errors are logged and are not fatal.  Processing continues
 //until the done channel has contents or is closed.
 func Run(api *godig.API, dir string, files chan string, done chan bool) {
@@ -202,7 +201,6 @@ func main() {
 		login = app.Flag("login", "YAML file with login credentials").Required().String()
 		dir   = app.Flag("dir", "Store contents starting in this directory.").Default(".").String()
 		count = app.Flag("count", "Start this number of processors.").Default("20").Int()
-		//data  = app.Arg("data", "File of URLs to store, one per line.").Required().String()
 	)
 	app.Parse(os.Args[1:])
 
@@ -224,8 +222,8 @@ func main() {
 		}(i)
 	}
 
-	// Start at the root dir.  Load will use itself
-	// to process subdirs.
+	// Start processing folders at the root dir.  Load will use
+	// itself to process subdirs.
 	err = Load(api, "/", files)
 	if err != nil {
 		panic(err)
