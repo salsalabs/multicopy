@@ -29,10 +29,12 @@ Files from the repository are written to disk, retaining then directory structur
     Go requires a specific directory structure in order to run correctly.  The easiest way to do this is to open a console window, navigate to your home directory and create a structure exactly like this.
   ```
     $HOME
-     + go
-       + bin
-       + pkg
-       + src
+      |
+      + go
+        |
+        + bin
+        + pkg
+        + src
   ```
 
 * Assuure that the Go `bin` directory in your path.  In Linux and OSX, the command is
