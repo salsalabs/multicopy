@@ -11,7 +11,7 @@ As you can see from the doc, the images and files repository is not accessible e
 
 This package contains a Go application that reads a client's images and files repository.
 Files from the repository are written to disk, retaining then directory structure from the repository.
-Tests show that `multicopy` runs in about 1% of the time that the original, `wget`-based process.
+The older, `wget`-based process usually consumed a couple of yours.  `Multicopy` does the same work in minute or two.
 # Prerequisites
 * Login credentials for the client.
 
