@@ -1,5 +1,5 @@
 # Multicopy
-## Quickly copy the contents of a list of URLs to disk.
+## Quickly copy images and files from Salsa HQ to disk.
 
 ## Background
 Salsa's clients store images and files on Salsa so that they can 
@@ -11,6 +11,7 @@ As you can see from the doc, the images and files repository is not accessible e
 
 This package contains a Go application that reads a client's images and files repository.
 Files from the repository are written to disk, retaining then directory structure from the repository.
+Tests show that `multicopy` runs in about 1% of the time that the original, `wget`-based process.
 # Prerequisites
 * Login credentials for the client.
 
@@ -70,7 +71,7 @@ and see something like this.
 multicopy --help
 usage: multicopy --login=LOGIN [<flags>]
 
-A command-line app to copy the contents of a list of URLs to a dir.
+A command-line app to copy images and files from a Salsa HQ to your disk.
 
 Flags:
   --help         Show context-sensitive help (also try --help-long and --help-man).

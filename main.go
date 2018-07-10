@@ -198,7 +198,7 @@ func Store(link string, dir string) (int64, error) {
 //URLs and processes them.
 func main() {
 	var (
-		app   = kingpin.New("multicopy", "A command-line app to copy the contents of a list of URLs to a dir.")
+		app   = kingpin.New("multicopy", "A command-line app to copy images and files from a Salsa HQ to your disk.")
 		login = app.Flag("login", "YAML file with login credentials").Required().String()
 		dir   = app.Flag("dir", "Store contents starting in this directory.").Default(".").String()
 		count = app.Flag("count", "Start this number of processors.").Default("20").Int()
