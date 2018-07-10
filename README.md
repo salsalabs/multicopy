@@ -147,36 +147,6 @@ If you are extracting images and files for a chapter, then the chapter is insert
 ```
 You can learn more about the images and files repository directory structure by [clicking  here](https://help.salsalabs.com/hc/en-us/articles/223342727-Managing-files-uploaded-to-Salsa).
 
-Here's an example.  Let's say that this is the image URL.
-
-`https://salsa4.salsalabs.comm/o/666/images/ochre/ogre/image.png`
-
-and this is the `multicopy` command line.
-```bash
-multicopy --login boffo.yaml --dir /home/me/mine
-```
-`Multicopy` will create this directory tree and then write `image.png`.
-
-```
-/home
-  |
-  + me
-    |
-    + mine
-      |
-      + o
-        |
-        + 666
-          | 
-          + images
-          |
-          + ochre
-            |
-            + ogre
-              |
-              + image.png
-```
-
 To save on client confusion, zip up the contents of the tree starting at "images" (wherever it is).  Clients will see their stuff fairly quickly and won't wonder why we have all of the directories starting at "o".
 
 ## License
