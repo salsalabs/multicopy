@@ -5,7 +5,7 @@
 Salsa's clients store images and files on Salsa so that they can 
 be served up using a secure ("https://") URL.  The files are uploaded to the "images and files" repository.  You can learn more
 about uploading images and files to Salsay by [clicking here](https://help.salsalabs.com/hc/en-us/articles/223342607-Upload-images-or-files-to-Salsa).
-You can learn more about the images and files repository itself by [clicking  here](https://help.salsalabs.com/hc/en-us/articles/223342727-Managing-files-uploaded-to-Salsa). 
+You can learn more about the images and files repository itself by [clicking here](https://help.salsalabs.com/hc/en-us/articles/223342727-Managing-files-uploaded-to-Salsa). 
 
 As you can see from the doc, the images and files repository is not accessible except on a file-by-file basis.  That _can_ be done manually, but it's tedious and takes hours.
 
@@ -15,19 +15,15 @@ The older, `wget`-based process usually consumed a couple of hours.  `Multicopy`
 # Prerequisites
 * Login credentials for the client.
 
-    If you are a Salsa client and you have valid campaign manager credentials, then you'll need to add them to a YAML login file (below).
+    If you are a Salsa client and no not have login credentials then see the person in your organization that manages Salsa Classic.
 
     If you are a Salsa staffer, then create campaign manager credentials for yourself in client's Salsa HQ.
 
-    *_Remember to remove the credentials after this process is done!_*
-
 * The [Go](https://golang.org/doc/install) programming language.
-
-    Click on the link and install Go first.  Everything else depends upon Go being installed.
 
 * The correct directory structure for Go.
 
-    Go requires a specific directory structure in order to run correctly.  The easiest way to do this is to open a console window, navigate to your home directory and create a structure exactly like this.
+    Go requires a very specific directory structure in order to run correctly.  The easiest way to do this is to open a console window, navigate to your home directory and create a structure exactly like this.
   ```
     $HOME
       |
@@ -38,15 +34,16 @@ The older, `wget`-based process usually consumed a couple of hours.  `Multicopy`
         + src
   ```
 
-* Assure that the Go `bin` directory in your path.  In Linux and OSX, the command is
+* Assure that the Go `bin` directory in your path.  [Click here](https://superuser.com/questions/284342/what-are-path-and-other-environment-variables-and-how-can-i-set-or-use-them) for a detailed discussion on the topic.  In Linux and OSX, the command is
 
     ```export PATH=$HOME/go/bin:$PATH```
   
-  There's a similar command in Windows -- you're on your own on that one...
+  See the article for steps to add the Go bin dir to the Windows environment.
 ## Installation
 
 1. If you have not done so already, install the [Go programming language](https://golang.org/doc/install).
-1. Retrieve the `godig` package.  It provides access to the Salsa Classic API:
+1. Open a console window. The rest of the installation commands need to be typed or copied/pasted.
+1. Retrieve the `godig` package.  It provides access to the Salsa Classic API.  
     ```bash
     go get github.com/salsalabs/godig
     ```
@@ -83,10 +80,7 @@ Flags:
 ## Login credentials
 
 The `multicopy` application looks for your login credentials in a YAML file.  You provide the filename as part of the execution.
-
-You can read up on YAML and its formatting rules [here](https://en.wikipedia.org/wiki/YAML) if you'd like.
-
-  The easiest way to get started is to  copy the `sample_login.yaml` file and edit it.  Here's an example.
+ The easiest way to get started is to  copy the `sample_login.yaml` file and edit it.  Here's an example.
 ```yaml
 host: wfc2.wiredforchange.com
 email: chuck@echeese.bizi
