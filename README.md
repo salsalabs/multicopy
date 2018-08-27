@@ -1,5 +1,5 @@
 # Multicopy
-## Quickly copy images and files from Salsa HQ to disk.
+## Quickly copy images and files uploaded to Salsa Classic
 
 ## Background
 Salsa's clients store images and files on Salsa so that they can 
