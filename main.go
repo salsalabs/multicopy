@@ -31,6 +31,7 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"strings"
 	"sync"
 
 	"github.com/salsalabs/godig"
@@ -157,6 +158,7 @@ func Run(api *godig.API, dir string, files chan string, done chan bool) {
 //the provided directory keeping the URL's directory structure
 //intact.
 func Store(link string, dir string) (int64, error) {
+	link = strings.Replace(link, "#", "%23", -1)
 	r, err := http.Get(link)
 	if err != nil {
 		return 0, err
