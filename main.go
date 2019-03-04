@@ -91,6 +91,7 @@ func Load(api *godig.API, dir string, files chan string) error {
 	var stdLog = log.New(os.Stdout, "", log.LstdFlags)
 	stdLog.Printf("Folder '%s'\n", dir)
 	u := fmt.Sprintf(RepTemplate, dir)
+	u = strings.Replace(u, " ", "%20", -1)
 	req, err := http.NewRequest("GET", u, nil)
 	if err != nil {
 		return err
@@ -123,10 +124,13 @@ func Load(api *godig.API, dir string, files chan string) error {
 
 	//Re-entrantly process folders.
 	for _, d := range v.Dirs.Entries {
-		p := v.Current.Path + d.Name + "/"
-		err = Load(api, p, files)
-		if err != nil {
-			errLog.Printf("%v on '%v'\n", err, d.Name)
+		fmt.Printf("%v contains '#'? %v\n", d.Name, strings.Contains(d.Name, "#"))
+		if !strings.Contains(d.Name, "#") {
+			p := v.Current.Path + d.Name + "/"
+			err = Load(api, p, files)
+			if err != nil {
+				errLog.Printf("%v on '%v'\n", err, d.Name)
+			}
 		}
 	}
 	return nil
