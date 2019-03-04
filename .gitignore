@@ -1,2 +1,5 @@
 # Login credentials files.
 logins/*
+# Output
+o/*
+images/*
