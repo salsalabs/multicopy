@@ -123,7 +123,6 @@ func Load(api *godig.API, dir string, files chan string) error {
 
 	//Re-entrantly process folders.
 	for _, d := range v.Dirs.Entries {
-		fmt.Printf("%v contains '#'? %v\n", d.Name, strings.Contains(d.Name, "#"))
 		if !strings.Contains(d.Name, "#") {
 			p := v.Current.Path + d.Name + "/"
 			err = Load(api, p, files)
