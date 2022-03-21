@@ -65,7 +65,7 @@ type Folders struct {
 	Entries []Folder `xml:"Folder"`
 }
 
-//Files represents a list of fileds. Can be empty.
+//Files represents a list of fields. Can be empty.
 type Files struct {
 	XMLName xml.Name `xml:"Files"`
 	Entries []Folder `xml:"File"`
@@ -82,6 +82,14 @@ type File struct {
 	Size string `xml:"size,attr"`
 }
 
+//FixURL accepts a URL and replaces a broken domain with the
+//correct SalsaDomain.
+func FixURL(u string) string {
+	f := strings.Replace(u, "salsa.ridersny.org", "salsa3.salsalabs.com/o/50801", -1)
+	f = strings.Replace(f, " ", "%20", -1)
+	return f
+}
+
 //Load reads repository folder names from a channel.  The directory
 //name is used to create a URL used to list the directory.  Files
 //in the directory are written to the files channel.
@@ -91,6 +99,7 @@ func Load(api *godig.API, dir string, files chan string) error {
 	stdLog.Printf("Folder '%s'\n", dir)
 	u := fmt.Sprintf(RepTemplate, dir)
 	u = strings.Replace(u, " ", "%20", -1)
+	u = FixURL(u)
 	req, err := http.NewRequest("GET", u, nil)
 	if err != nil {
 		return err
@@ -143,6 +152,7 @@ func Run(api *godig.API, dir string, files chan string, done chan bool) {
 	for {
 		select {
 		case u := <-files:
+			u = FixURL(u)
 			_, err := Store(u, dir)
 			if err != nil {
 				errLog.Printf("Error: %v %s\n", err, u)
