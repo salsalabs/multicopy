@@ -86,6 +86,7 @@ type File struct {
 //correct SalsaDomain.
 func FixURL(u string) string {
 	f := strings.Replace(u, "salsa.ridersny.org", "salsa3.salsalabs.com/o/50801", -1)
+	f = strings.Replace(u, "participate.lwv.org", "salsa.wiredforchange.com/o/5950", -1)
 	f = strings.Replace(f, " ", "%20", -1)
 	return f
 }
