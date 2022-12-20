@@ -1,8 +1,8 @@
-//Multicopy is a multi-threaded URL retriever.  You provide
-//provide login credentials to an instance of Salas Classic.
-//Multicopy walks the directory tree in the images and files
-//repository and saves files to disk.  Files are stored in the
-//same structure on disk as they appear in the repository.
+// Multicopy is a multi-threaded URL retriever.  You provide
+// provide login credentials to an instance of Salas Classic.
+// Multicopy walks the directory tree in the images and files
+// repository and saves files to disk.  Files are stored in the
+// same structure on disk as they appear in the repository.
 //
 // Installation:
 //
@@ -17,7 +17,6 @@
 // Help:
 //
 // multicopy --help
-//
 package main
 
 import (
@@ -44,7 +43,7 @@ const (
 	RepTemplate = `https://hq.salsalabs.com/salsa/include/fck2.5.1/editor/filemanager/browser/default/connectors/jsp/connector?Command=GetFoldersAndFiles&Type=Image&CurrentFolder=%s`
 )
 
-//Connector is the wrapper for the rest of the XML-based structure.
+// Connector is the wrapper for the rest of the XML-based structure.
 type Connector struct {
 	Command      string        `xml:"command,attr"`
 	ResourceType string        `xml:"resourceType,attr"`
@@ -53,47 +52,49 @@ type Connector struct {
 	Files        Files         `mxl:"Files"`
 }
 
-//CurrentFolder is the current folder being parsed.
+// CurrentFolder is the current folder being parsed.
 type CurrentFolder struct {
 	Path string `xml:"path,attr"`
 	URL  string `xml:"url,attr"`
 }
 
-//Folders represents a list of folders.  Can be empty.
+// Folders represents a list of folders.  Can be empty.
 type Folders struct {
 	XMLName xml.Name `xml:"Folders"`
 	Entries []Folder `xml:"Folder"`
 }
 
-//Files represents a list of fields. Can be empty.
+// Files represents a list of fields. Can be empty.
 type Files struct {
 	XMLName xml.Name `xml:"Files"`
 	Entries []Folder `xml:"File"`
 }
 
-//Folder represents a folder.  No contents, just the folder.
+// Folder represents a folder.  No contents, just the folder.
 type Folder struct {
 	Name string `xml:"name,attr"`
 }
 
-//File represents a file in the current folder.
+// File represents a file in the current folder.
 type File struct {
 	Name string `xml:"name,attr"`
 	Size string `xml:"size,attr"`
 }
 
-//FixURL accepts a URL and replaces a broken domain with the
-//correct SalsaDomain.
+// FixURL accepts a URL and replaces a broken domain with the
+// correct SalsaDomain.
 func FixURL(u string) string {
 	f := strings.Replace(u, "salsa.ridersny.org", "salsa3.salsalabs.com/o/50801", -1)
 	f = strings.Replace(u, "participate.lwv.org", "salsa.wiredforchange.com/o/5950", -1)
+	f = strings.Replace(u, "uccmediajustice.org", "org2.salsalabs.com/o/6587", -1)
+	f = strings.Replace(f, "http:", "https:", -1)
 	f = strings.Replace(f, " ", "%20", -1)
 	return f
 }
 
-//Load reads repository folder names from a channel.  The directory
-//name is used to create a URL used to list the directory.  Files
-//in the directory are written to the files channel.
+// Load reads repository folder names from a channel.  The directory
+// name is used to create a URL used to list the directory.  Files
+// in the directory are written to the files channel.
 func Load(api *godig.API, dir string, files chan string) error {
 	var errLog = log.New(os.Stderr, "", log.LstdFlags)
 	var stdLog = log.New(os.Stdout, "", log.LstdFlags)
@@ -144,9 +145,9 @@ func Load(api *godig.API, dir string, files chan string) error {
 	return nil
 }
 
-//Run reads names from the files channel and writes them to disk.
-//Errors are logged and are not fatal.  Processing continues
-//until the done channel has contents or is closed.
+// Run reads names from the files channel and writes them to disk.
+// Errors are logged and are not fatal.  Processing continues
+// until the done channel has contents or is closed.
 func Run(api *godig.API, dir string, files chan string, done chan bool) {
 	var errLog = log.New(os.Stderr, "", log.LstdFlags)
 	//var stdLog = log.New(os.Stdout, "", log.LstdFlags)
@@ -167,9 +168,9 @@ func Run(api *godig.API, dir string, files chan string, done chan bool) {
 	}
 }
 
-//Store saves a URL to disk.  The contents are stored starting in
-//the provided directory keeping the URL's directory structure
-//intact.
+// Store saves a URL to disk.  The contents are stored starting in
+// the provided directory keeping the URL's directory structure
+// intact.
 func Store(link string, dir string) (int64, error) {
 	link = strings.Replace(link, "#", "%23", -1)
 	r, err := http.Get(link)
@@ -203,8 +204,8 @@ func Store(link string, dir string) (int64, error) {
 	return int64(n), nil
 }
 
-//main is the application.  Gathers arguments, starts listeners, reads
-//URLs and processes them.
+// main is the application.  Gathers arguments, starts listeners, reads
+// URLs and processes them.
 func main() {
 	var (
 		app   = kingpin.New("multicopy", "A command-line app to copy images and files from a Salsa HQ to your disk.")
